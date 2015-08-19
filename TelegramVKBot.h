@@ -5,7 +5,7 @@
 #ifndef TELEGRAMBOTTEST_TELEGRAMVKBOT_H
 #define TELEGRAMBOTTEST_TELEGRAMVKBOT_H
 
-#include "ITelegramBot.h"
+#include "TelegramBotAPI/ITelegramBot.h"
 
 class TelegramVKBot : public TelegramBotAPI::ITelegramBot {
 public:

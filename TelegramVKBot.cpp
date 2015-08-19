@@ -4,6 +4,7 @@
 
 #include "TelegramVKBot.h"
 #include "api_helper.h"
+#include "TelegramBotAPI/TelegramBotAPI_Types.h"
 #include <curl/curl.h>
 
 using namespace std;

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "TelegramBotAPI_Types.h"
+#include "TelegramBotAPI/TelegramBotAPI_Types.h"
 #include "TelegramVKBot.h"
 
 using namespace std;
