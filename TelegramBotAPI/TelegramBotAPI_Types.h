@@ -10,104 +10,245 @@
 #include <json-c/json.h>
 #include <iostream>
 #include <cstring>
+#include <vector>
 #include "BadRequestError.h"
+
+using std::string;
+using std::vector;
 
 namespace TelegramBotAPI {
 
-    // Describes types that are using in telegram BOT api. All data telegram transfer in a JSON,
-    // so all the constructors of classes in that namespace parses JSON.
+    // Describes types that are using in telegram BOT api. All data telegram transfer in JSON,
+    // so all the constructors of struct's in that namespace parses JSON.
     namespace types {
 
-        // FIXME: should i use free to delete jobj and result?
+
         struct User {
 
-            User(const std::string& jsonString) {
-                // Create main json parse object
-                json_object* jobj = json_tokener_parse(jsonString.c_str());
-
-                // Get "ok" field from json tree
-                json_object* ok;
-                if (!json_object_object_get_ex(jobj, "ok", &ok)) {
-                    // If message from telegram doesn't conatin "ok" field
-                    throw TelegramBotAPI::BadRequestError(TelegramBotAPI::BadRequestError::UnknownErrorMsg,
-                                                          TelegramBotAPI::BadRequestError::UnknownErrorCode);
-                } else {
-                    // Getting meaning of "ok" field
-                    json_bool res = json_object_get_boolean(ok);
-
-                    // If it contains "true" than get data from "result"
-                    if (res) {
-
-                        json_object* result;
-
-                        if (!json_object_object_get_ex(jobj, "result", &result)) {
-                            throw TelegramBotAPI::BadRequestError(TelegramBotAPI::BadRequestError::UnknownErrorMsg,
-                                                                  TelegramBotAPI::BadRequestError::UnknownErrorCode);
-                        } else {
-                            // Going through "result" field and getting target values
-                            json_object_object_foreach(result, key, val) {
-                                if      (!strcmp(key, "first_name")) first_name = json_object_get_string(val);
-                                else if (!strcmp(key, "last_name"))  last_name = json_object_get_string(val);
-                                else if (!strcmp(key, "username"))   username = json_object_get_string(val);
-                                else if (!strcmp(key, "id"))         id = json_object_get_int(val);
-                            }
-                        }
-                    // If "ok" field is false
-                    } else {
-                        json_object* error_code, *description;
-                        json_bool t1 = json_object_object_get_ex(jobj, "error_code", &error_code);
-                        json_bool t2 = json_object_object_get_ex(jobj, "description", &description);
-
-                        if (t1 != 0 && t2 != 0) {
-                            throw TelegramBotAPI::BadRequestError(json_object_get_string(description),
-                                                                  json_object_get_int(error_code));
-                        } else {
-                            throw TelegramBotAPI::BadRequestError(TelegramBotAPI::BadRequestError::UnknownErrorMsg,
-                                                            TelegramBotAPI::BadRequestError::UnknownErrorCode);
-                        }
-                    }
-                }
-            }
+            User() =default;
+            User(const string& jsonString);
 
             int32_t id;
-            std::string first_name;
-            std::string last_name;
-            std::string username;
+            string first_name;
+            string last_name;
+            string username;
         };
 
-        struct GroupChar {
+        struct GroupChat {
+
+            GroupChat() =default;
+            GroupChat(const string& jsonString);
+
+            int32_t id;
+            string title;
+        };
+
+
+        struct PhotoSize {
+
+            PhotoSize() =default;
+            PhotoSize(const string& jsonString) noexcept;
+
+            string file_id;
+            int32_t width;
+            int32_t height;
+            int32_t file_size;
 
         };
 
-        struct Message {};
+        struct Audio {
 
-        struct PhotoSize {};
+            Audio() =default;
+            Audio(const string& jsonString);
 
-        struct Audio {};
+            string file_id;
+            int32_t duration;
+            string performer;
+            string title;
+            string mime_type;
+            int32_t file_size;
 
-        struct Document {};
+        };
 
-        struct Sticker {};
+        struct Document {
 
-        struct Video {};
+            Document() =default;
+            Document(const string& jsonString);
 
-        struct Voice {};
+            string file_id;
+            PhotoSize thumb;
+            string file_name;
+            string mime_type;
+            int32_t file_size;
 
-        struct Contact {};
+        };
 
-        struct Location {};
+        struct Sticker {
 
-        struct Update {};
+            Sticker() =default;
+            Sticker(const string& jsonString);
 
-        struct InputFile {};
+            string file_id;
+            int32_t width;
+            int32_t height;
+            PhotoSize thumb;
+            int32_t file_size;
 
-        struct UserProfilePhotos {};
+        };
 
-        struct ReplyKeyboardMarkup {};
+        struct Video {
 
-        struct ReplyKeyboardHide {};
+            Video() =default;
+            Video(const string& jsonString);
 
-        struct ForceReply {};
+            string file_id;
+            int32_t width;
+            int32_t height;
+            int32_t duration;
+
+            PhotoSize thumb;
+            string mime_type;
+            int32_t file_size;
+
+        };
+
+        struct Voice {
+
+            Voice() =default;
+            Voice(const string& jsonString);
+
+            string file_id;
+            int32_t duration;
+            string mime_type;
+            int32_t file_size;
+        };
+
+        struct Contact {
+
+            Contact() =default;
+            Contact(const string& jsonString);
+
+            string phone_number;
+            string first_name;
+            string last_name;
+            int32_t user_id;
+
+        };
+
+        struct Location {
+
+            Location() =default;
+            Location(const string& jsonString);
+
+            double longitude;
+            double latitude;
+        };
+
+        struct Message {
+
+            Message() =default;
+            Message(const string& jsonString);
+            //~Message() { if (reply_to_message != nullptr) delete reply_to_message; };
+
+            int32_t                message_id;
+            User                   from;
+            int32_t                date;
+
+            // FIXME: why i can't use union here?
+            // Conversation the message belongs to — user in case
+            // of a private message, GroupChat in case of a group
+            struct {
+                User user;
+                GroupChat group_chat;
+            } chat;
+
+            User                   forward_from;
+            int32_t                forward_date;
+            Message*               reply_to_message{};
+            string                 text;
+            Audio                  audio;
+            Document               document;
+            vector<PhotoSize>      photo;
+            Sticker                sticker;
+            Video                  video;
+            Voice                  voice;
+            string                 caption;
+            Contact                contact;
+            Location               location;
+            User                   new_char_participant;
+            User                   left_chat_participant;
+            string                 new_chat_title;
+            vector<PhotoSize>      new_chat_photo;
+            bool                   delete_chat_photo;
+            bool                   group_chat_created;
+
+        };
+
+        struct Update {
+
+            Update() =default;
+            Update(const string& jsonString);
+
+            int32_t update_id;
+            Message message{};
+        };
+
+        struct InputFile {
+
+            InputFile(const string& fileName) :
+                file_name(fileName) { }
+
+            string file_name;
+            
+        };
+
+        struct UserProfilePhotos {
+
+            UserProfilePhotos() =default;
+           // UserProfilePhotos(const string& jsonString);
+
+            int32_t total_count;
+            vector<vector<PhotoSize> > photos;
+
+        };
+
+        struct ReplyKeyboardMarkup {
+
+            ReplyKeyboardMarkup(const vector<vector<string> >& keyboard,
+                                const bool resize_keyboard =false,
+                                const bool one_time_keyboard =false,
+                                const bool selective =false);
+
+            vector<vector<string> > keyboard;
+            bool resize_keyboard;
+            bool one_time_keyboard;
+            bool selective;
+
+            string serializedString;
+
+        };
+
+        struct ReplyKeyboardHide {
+
+            ReplyKeyboardHide(const bool selective =false);
+
+            const bool hide_keyboard = true;
+            bool selective;
+
+            string serializedString;
+
+        };
+
+        struct ForceReply {
+
+            ForceReply(const bool selective =false);
+
+            const bool force_reply = true;
+            bool selective;
+
+            string serializedString;
+
+        };
     }
 
 }

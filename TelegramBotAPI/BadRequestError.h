@@ -28,8 +28,8 @@ namespace TelegramBotAPI {
         explicit BadRequestError(const std::string& description, const int32_t errCode) :
             std::runtime_error(description), m_Description(description), m_ErrCode(errCode) { }
 
-        const char* what() const throw() { return m_Description.c_str(); }
-        const int32_t getErrCode() const { return m_ErrCode; }
+        const char* what() const noexcept { return m_Description.c_str(); }
+        const int32_t getErrCode() const noexcept{ return m_ErrCode; }
     };
 
 }
