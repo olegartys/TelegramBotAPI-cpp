@@ -25,11 +25,15 @@ public:
     SimpleTelegramBot(const std::string& authToken) :
             m_AuthToken(authToken) { }
 
+    virtual std::string getAuthToken() const final { return m_AuthToken; }
+
     ~SimpleTelegramBot() =default;
 
     TelegramBotAPI::types::User getMe() const override;
 
-    std::vector<TelegramBotAPI::types::Update> getUpdates() const override;
+    std::vector<TelegramBotAPI::types::Update> getUpdates(const int32_t* offset =nullptr,
+                                                          const int32_t* limit =nullptr,
+                                                          const int32_t* timeout =nullptr) const override;
 
     TelegramBotAPI::types::Message sendMessage(const int32_t chat_id, const std::string& text,
                                                const bool* disable_web_page_preview =nullptr,

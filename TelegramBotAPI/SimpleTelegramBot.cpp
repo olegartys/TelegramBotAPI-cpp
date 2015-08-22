@@ -133,11 +133,20 @@ User SimpleTelegramBot::getMe() const {
 }
 
 
-vector<Update> SimpleTelegramBot::getUpdates() const {
+vector<Update> SimpleTelegramBot::getUpdates(const int32_t* offset,
+                                             const int32_t* limit,
+                                             const int32_t* timeout) const {
 
     const string queryFuncName = "getUpdates";
 
-    const string queryString = string(ApiHelper::baseURL+this->m_AuthToken+"/"+queryFuncName);
+    string queryParams;
+    if (offset != nullptr)
+        queryParams += "&offset=" + to_string(*offset);
+    if (limit != nullptr)
+        queryParams += "&limit=" + to_string(*limit);
+    if (timeout != nullptr)
+        queryParams += "&timeout=" + to_string(*timeout);
+    const string queryString = string(ApiHelper::baseURL+this->m_AuthToken+"/"+queryFuncName+"?"+queryParams);
     const string jsonResponseString = sendQuery(queryString);
 
     json_object* jobj = json_tokener_parse(jsonResponseString.c_str());
