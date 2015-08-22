@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+
 #include "TelegramBotAPI_Types.h"
 
 namespace TelegramBotAPI {
@@ -19,6 +20,8 @@ namespace TelegramBotAPI {
      */
     class ITelegramBot {
     public:
+
+        virtual ~ITelegramBot() =default;
 
         /**
          * A simple method for testing your bot's auth token.
@@ -93,17 +96,51 @@ namespace TelegramBotAPI {
                                                            const std::string* serialized_reply_markup =nullptr) const =0;
 
 
+        /**
+         * Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
+         */
         virtual TelegramBotAPI::types::Message sendVideo(const int32_t chat_id, const TelegramBotAPI::types::InputFile& video,
                                                          const int32_t* duration =nullptr,
                                                          const string* caption =nullptr,
                                                          const int32_t* reply_to_message_id =nullptr,
                                                          const std::string* serialized_reply_markup =nullptr) const =0;
-//        virtual std::string sendQuery(const std::string& funcName) const =0;
 
-        virtual ~ITelegramBot() =default;
+        /**
+         * Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message.
+         * For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Audio or Document).
+         */
+        virtual TelegramBotAPI::types::Message sendVoice(const int32_t chat_id, const TelegramBotAPI::types::InputFile& audio,
+                                                          const int32_t* duration =nullptr,
+                                                          const int32_t* reply_to_message_id =nullptr,
+                                                          const std::string* serialized_reply_markup =nullptr) const =0;
+
+        /**
+         * Use this method to send point on the map.
+         */
+        virtual TelegramBotAPI::types::Message sendLocation(const int32_t chat_id, const float latitude, const float longitude,
+                                                            const int32_t* reply_to_message_id =nullptr,
+                                                            const std::string* serialized_reply_markup =nullptr) const =0;
+
+        /**
+         * Use this method when you need to tell the user that something is happening on the bot's side.
+         * The status is set for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
+         */
+        enum class ActionType {
+            TYPING, UPLOAD_PHOTO,
+            RECORD_VIDEO, UPLOAD_VIDEO,
+            RECORD_AUDIO, UPLOAD_AUDIO,
+            UPLOAD_DOCUMENT, FIND_LOCATION
+        };
+        virtual void sendChatAction(const int32_t chat_id, const ActionType action) const =0;
+
+        /**
+         * Use this method to get a list of profile pictures for a user.
+         */
+        virtual TelegramBotAPI::types::UserProfilePhotos getUserProfilePhotos(const int32_t user_id,
+                                                                              const int32_t* offset =nullptr,
+                                                                              const int32_t* limit =nullptr) const =0;
 
     };
-
 }
 
 

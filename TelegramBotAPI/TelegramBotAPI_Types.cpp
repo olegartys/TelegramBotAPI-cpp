@@ -99,6 +99,7 @@ Audio::Audio(const string& jsonString) {
     }
 }
 
+
 Document::Document(const std::string &jsonString) {
     json_object* result = json_tokener_parse(jsonString.c_str());
     json_object_object_foreach(result, key, val) {
@@ -110,6 +111,7 @@ Document::Document(const std::string &jsonString) {
     }
 }
 
+
 Sticker::Sticker(const std::string &jsonString) {
     json_object *result = json_tokener_parse(jsonString.c_str());
     json_object_object_foreach(result, key, val) {
@@ -120,6 +122,7 @@ Sticker::Sticker(const std::string &jsonString) {
         else if (!strcmp(key, "file_size")) file_size = json_object_get_int(val);
     }
 }
+
 
 Video::Video(const std::string &jsonString) {
     json_object *result = json_tokener_parse(jsonString.c_str());
@@ -134,6 +137,7 @@ Video::Video(const std::string &jsonString) {
     }
 }
 
+
 Voice::Voice(const std::string &jsonString) {
     json_object *result = json_tokener_parse(jsonString.c_str());
     json_object_object_foreach(result, key, val) {
@@ -143,6 +147,7 @@ Voice::Voice(const std::string &jsonString) {
         else if (!strcmp(key, "file_size")) file_size = json_object_get_int(val);
     }
 }
+
 
 Contact::Contact(const std::string &jsonString) {
     json_object *result = json_tokener_parse(jsonString.c_str());
@@ -154,6 +159,7 @@ Contact::Contact(const std::string &jsonString) {
     }
 }
 
+
 Location::Location(const std::string &jsonString) {
     json_object *result = json_tokener_parse(jsonString.c_str());
     json_object_object_foreach(result, key, val) {
@@ -162,7 +168,8 @@ Location::Location(const std::string &jsonString) {
     }
 }
 
-PhotoSize::PhotoSize(const std::string &jsonString) noexcept {
+
+PhotoSize::PhotoSize(const std::string &jsonString) {
     json_object *result = json_tokener_parse(jsonString.c_str());
     json_object_object_foreach(result, key, val) {
         if      (!strcmp(key, "file_id"))   file_id   = json_object_get_string(val);
@@ -171,6 +178,37 @@ PhotoSize::PhotoSize(const std::string &jsonString) noexcept {
         else if (!strcmp(key, "file_size")) file_size = json_object_get_int(val);
     }
 }
+
+
+UserProfilePhotos::UserProfilePhotos(const string& jsonString) {
+
+    json_object* result = json_tokener_parse(jsonString.c_str());
+    json_object_object_foreach(result, key, val) {
+        if      (!strcmp(key, "total_count")) total_count = json_object_get_int(val);
+        else if (!strcmp(key, "photos")) {
+
+            // Getting length of external array
+            int mainArrLen = json_object_array_length(val);
+            // Passing throug external array
+            for (int i = 0; i < mainArrLen; ++i) {
+
+                // Getting component array
+                json_object* componentArr = json_object_array_get_idx(val, i);
+                int componentArrLen = json_object_array_length(componentArr);
+                vector<PhotoSize> componentVector(componentArrLen);
+
+                // Passing through component array
+                for (int j = 0; j < componentArrLen; ++j) {
+                    json_object* jobj = json_object_array_get_idx(componentArr, j);
+                    componentVector[i] = PhotoSize(json_object_to_json_string(jobj));
+                }
+
+                photos.push_back(componentVector);
+            }
+        }
+    }
+}
+
 
 ReplyKeyboardMarkup::ReplyKeyboardMarkup(const vector<vector<string> >& keyboard,
                                          const bool resize_keyboard,
@@ -199,6 +237,7 @@ ReplyKeyboardMarkup::ReplyKeyboardMarkup(const vector<vector<string> >& keyboard
 
 }
 
+
 ReplyKeyboardHide::ReplyKeyboardHide(const bool selective) {
 
     json_object* jobj = json_object_new_object();
@@ -208,6 +247,7 @@ ReplyKeyboardHide::ReplyKeyboardHide(const bool selective) {
     serializedString = json_object_to_json_string(jobj);
 
 }
+
 
 ForceReply::ForceReply(const bool selective) {
 

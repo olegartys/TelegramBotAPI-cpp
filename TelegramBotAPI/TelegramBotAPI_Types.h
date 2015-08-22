@@ -22,7 +22,6 @@ namespace TelegramBotAPI {
     // so all the constructors of struct's in that namespace parses JSON.
     namespace types {
 
-
         struct User {
 
             User() =default;
@@ -47,7 +46,7 @@ namespace TelegramBotAPI {
         struct PhotoSize {
 
             PhotoSize() =default;
-            PhotoSize(const string& jsonString) noexcept;
+            PhotoSize(const string& jsonString);
 
             string file_id;
             int32_t width;
@@ -204,11 +203,10 @@ namespace TelegramBotAPI {
 
         struct UserProfilePhotos {
 
-            UserProfilePhotos() =default;
-           // UserProfilePhotos(const string& jsonString);
+            UserProfilePhotos(const string& jsonString);
 
             int32_t total_count;
-            vector<vector<PhotoSize> > photos;
+            vector<vector<PhotoSize>> photos;
 
         };
 

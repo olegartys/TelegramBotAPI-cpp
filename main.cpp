@@ -1,8 +1,6 @@
 #include <iostream>
-#include "TelegramBotAPI/TelegramBotAPI_Types.h"
-#include "TelegramVKBot.h"
-#include "api_helper.h"
-#include <curl/curl.h>
+
+#include "TelegramBotAPI/TelegramBotAPI.h"
 
 using namespace std;
 
@@ -11,7 +9,7 @@ const int32_t olegartys_id = 138168286;
 
 int main()
 {
-    TelegramVKBot bot(BOT_TOKEN);
+    SimpleTelegramBot bot(BOT_TOKEN);
 
     try {
 
